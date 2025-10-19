@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Mental Wellness Hub</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f7f7f9; }
+        /* Custom scrollbar for chat */
+        #chat-window::-webkit-scrollbar { width: 8px; }
+        #chat-window::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 4px; }
+        #chat-window { scroll-behavior: smooth; }
+
+        /* AI Bot Animation (simple pulsing circle) */
+        .ai-pulse {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #6366f1;
+            box-shadow: 0 0 0 0 rgba(99, 102, 241, 1);
+            animation: pulse-shadow 2s infinite;
+        }
+        @keyframes pulse-shadow {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        #emergency-button {
+            animation: pulse-shadow-red 2.5s infinite;
+        }
+        @keyframes pulse-shadow-red { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
+        
+        .chat-bubble-user {
+            background-color: #3b82f6; /* Blue 500 */
+            color: white;
+            border-radius: 1.5rem 1.5rem 0.5rem 1.5rem;
+        }
+        .chat-bubble-ai {
+            background-color: #e5e7eb; /* Gray 200 */
+            color: #1f2937; /* Gray 800 */
+            border-radius: 1.5rem 1.5rem 1.5rem 0.5rem;
+        }
+
+        /* View Transitions */
+        #view-container.view-entering {
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Full Page Loader */
+        #app-loader {
+            transition: opacity 0.5s ease-out;
+        }
+        .loader-spinner {
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            border-left-color: #6366f1;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Layout for Nav */
+        @media (max-width: 768px) {
+            #main-nav {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                flex-direction: row;
+                justify-content: space-around;
+                z-index: 10;
+                border-top: 1px solid #e5e7eb;
+            }
+            .nav-item {
+                padding: 0.5rem 0.25rem;
+                flex: 1;
+            }
+            #main-content {
+                margin-left: 0;
+                padding-bottom: 5rem; /* Space for fixed bottom nav */
+            }
+        }
+        /* Assessment Button Styles */
+        .score-btn {
+            @apply flex-1 p-4 rounded-xl text-center font-semibold transition-transform duration-200 transform hover:scale-[1.03] shadow-md;
+        }
+        .score-btn-0 { @apply bg-green-500 text-white hover:bg-green-600; }
+        .score-btn-1 { @apply bg-yellow-500 text-white hover:bg-yellow-600; }
+        .score-btn-2 { @apply bg-orange-500 text-white hover:bg-orange-600; }
+        .score-btn-3 { @apply bg-red-500 text-white hover:bg-red-600; }
+
+        /* Breathing Game Animation */
+        .breathing-circle {
+            animation: breathe 8s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%   { transform: scale(0.8); }
+            50%  { transform: scale(1.2); }
+            100% { transform: scale(0.8); }
+        }
+
+        /* Mood Calendar Styles */
+        .mood-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        .mood-calendar-day {
+            @apply aspect-square flex items-center justify-center rounded-lg border text-sm;
+        }
+        .mood-calendar-day.has-mood { @apply font-bold text-lg; }
+        .mood-calendar-day.other-month { @apply text-gray-300; }
+        
+        /* Resource Content Container Height (to avoid main page scroll) */
+        #resource-content-container {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        @media (max-width: 768px) {
+            #resource-content-container {
+                max-height: 40vh; /* Adjust for smaller mobile screens */
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex bg-gray-50">
+
+    <!-- Sidebar Navigation (Desktop) / Bottom Nav (Mobile) -->
+    <nav id="main-nav" class="bg-white p-4 shadow-lg flex flex-col md:w-56 w-full md:h-screen transition-all duration-300">
+        <div class="hidden md:block">
+            <h1 class="text-xl font-bold text-indigo-700 mb-6">Wellness Hub</h1>
+        </div>
+        
+        <div class="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-1">
+            <!-- Navigation buttons call window.navigate, which is defined in the script module -->
+            <button onclick="window.navigate('home')" class="nav-item flex items-center p-3 text-indigo-700 rounded-xl hover:bg-indigo-100 transition-colors bg-indigo-100 font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                <span class="hidden md:inline">My Space</span>
+            </button>
+            <button onclick="window.navigate('chatbot')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <span class="hidden md:inline">Talk with Aura</span>
+            </button>
+            <button onclick="window.navigate('assessment')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-9 0V3h10v2m-9 0h10"/></svg>
+                <span class="hidden md:inline">Guided Check-ins</span>
+            </button>
+            <button onclick="window.navigate('journal')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"/></svg>
+                <span class="hidden md:inline">Mood & Journal</span>
+            </button>
+            <button onclick="window.navigate('resources')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                <span class="hidden md:inline">Wellness Library</span>
+            </button>
+            <button onclick="window.navigate('forms')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M9 11h.01M9 15h.01M16 11h.01M16 15h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="hidden md:inline">Connect & Share</span>
+            </button>
+        </div>
+        
+        <div class="mt-auto hidden md:block pt-4 border-t border-gray-100 text-xs text-gray-500">
+            <p>Your Confidential ID:</p>
+            <p class="font-mono break-all text-sm" id="user-id-display">Initializing...</p>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 p-4 md:p-10">
+        <div id="view-container" class="max-w-5xl mx-auto">
+            <!-- All view contents will be injected here -->
+        </div>
+    </main>
+
+    <!-- App-wide Loader -->
+    <div id="app-loader" class="fixed inset-0 bg-gray-50 z-[9999] flex flex-col items-center justify-center">
+        <div class="loader-spinner w-12 h-12 rounded-full"></div>
+        <p class="mt-4 text-gray-600 font-medium">Initializing Wellness Hub...</p>
+    </div>
+
+    <!-- Emergency Contact Button (Fixed Position) -->
+    <button id="emergency-button" onclick="window.showEmergencyContacts()" class="fixed bottom-20 md:bottom-10 right-4 md:right-10 bg-red-600 text-white p-4 rounded-full shadow-2xl hover:bg-red-700 transition-transform transform hover:scale-105 z-20 flex items-center font-bold">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="ml-2 hidden sm:inline">EMERGENCY HELP</span>
+    </button>
+    
+    <!-- Custom Modal Container -->
+    <div id="custom-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div id="modal-box" class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0">
+            <h3 id="modal-title" class="text-xl font-bold mb-4 text-red-600">Urgent Alert</h3>
+            <div id="modal-content" class="text-gray-700 space-y-3">
+                <!-- Content will be injected here -->
+            </div>
+            <button onclick="window.closeModal()" class="mt-6 w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK Imports and Application Logic (Module) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, serverTimestamp, addDoc, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Not strictly needed for runtime
+
+        // --- Global Application State and Firebase Variables ---
+        let db = null;
+        let auth = null;
+        let userId = null;
+        let isAuthReady = false;
+        let chatHistory = [];
+        let journalLogs = []; // Stores fetched journal entries
+        
+        // Assessment State
+        let assessmentState = {
+            test: 'phq9', // 'phq9' or 'gad7'
+            qIndex: 0,
+            phq9_scores: new Array(9).fill(0),
+            gad7_scores: new Array(7).fill(0)
+        };
+        window.assessmentState = assessmentState; // Expose for testing/debugging
+
+        // --- CONFIGURED FIREBASE & GEMINI KEYS ---
+        // These keys were provided by the user for local execution.
+        const GEMINI_API_KEY = "AIzaSyA_g7CNI4LPmAcZlmtyEKzCncJBruN7zNU";
+        const appId = 'student-wellness-hub-ddae5'; // Your Project ID
+        const firebaseConfig = {
+            apiKey: "AIzaSyAE_g-aE86v1q2CPk5lXgFctmiuxJYJv8E",
+            authDomain: "student-wellness-hub-ddae5.firebaseapp.com",
+            projectId: "student-wellness-hub-ddae5",
+            storageBucket: "student-wellness-hub-ddae5.firebase-storage.app",
+            messagingSenderId: "31646393861",
+            appId: "1:31646393861:web:b7722e4f3a675080151e6c",
+            measurementId: "G-5Y6KVLVP1D"
+        };
+        const initialAuthToken = null;
+        // --- END CONFIGURATION ---
+        
+        let currentView = 'home';
+        const VIEW_MAP = {
+            'home': renderHomeView,
+            'chatbot': renderChatbotView,
+            'assessment': renderAssessmentView,
+            'journal': renderJournalView,
+            'resources': renderResourcesView,
+            'forms': renderFormsView
+        };
+        const COLLECTIONS = {
+            journal: 'mood_logs',
+            appointments: 'appointments',
+            feedback: 'confidential_feedback'
+        };
+
+        // --- Core Helpers (Exposed to window for HTML `onclick`) ---
+
+        /**
+         * Checks if the application is online and Firebase is initialized.
+         */
+        function isOnline() {
+            return navigator.onLine && db;
+        }
+        window.isOnline = isOnline; // Expose globally
+
+        /**
+         * Returns the latest mood data from the fetched logs.
+         * @returns {object|null} The latest journal entry or null.
+         */
+        function getLatestMoodData() {
+            if (journalLogs.length === 0) return null;
+            // Since logs are fetched ordered by timestamp descending, the first one is the latest.
+            const latest = journalLogs[0];
+            const dateStr = latest.timestamp 
+                ? new Date(latest.timestamp.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                : latest.date || 'N/A';
+            
+            return {
+                mood: latest.mood,
+                notes: latest.notes,
+                date: dateStr
+            };
+        }
+
+        /**
+         * Handles view navigation and updates the active navigation button.
+         */
+        function navigate(viewName) {
+            currentView = viewName;
+            const container = document.getElementById('view-container');
+            container.innerHTML = '';
+            container.classList.add('view-entering');
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const itemViewName = item.getAttribute('onclick').match(/'([^']*)'/)?.[1];
+                if (itemViewName === viewName) {
+                    item.classList.add('bg-indigo-100', 'text-indigo-700', 'font-semibold');
+                    item.classList.remove('text-gray-700');
+                } else {
+                    item.classList.remove('bg-indigo-100', 'text-indigo-700', 'font-semibold');
+                    item.classList.add('text-gray-700');
+                }
+            });
+
+            if (VIEW_MAP[viewName]) {
+                VIEW_MAP[viewName](container);
+            } else {
+                container.innerHTML = `<h2 class="text-2xl font-bold text-gray-800">404 - View Not Found</h2>`;
+            }
+
+            // Remove animation class after it finishes
+            setTimeout(() => {
+                container.classList.remove('view-entering');
+            }, 400);
+        }
+        window.navigate = navigate; // Expose globally
+
+        /**
+         * Displays the custom modal.
+         */
+        function showModal(title, contentHTML) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').innerHTML = contentHTML; 
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+            setTimeout(() => { // Animate in
+                document.getElementById('modal-box').classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+        window.showModal = showModal; // Expose globally
+
+        /**
+         * Closes the custom modal.
+         */
+        function closeModal() { 
+            document.getElementById('modal-box').classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { // Wait for animation before hiding
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+            }, 300);
+        }
+        window.closeModal = closeModal; // Expose globally
+
+        /**
+         * Shows the emergency contact modal.
+         */
+        function showEmergencyContacts() {
+            showModal('Immediate Assistance Needed', `
+                <p class="text-base">Please reach out to the contacts below immediately if you are experiencing a crisis.</p>
+                <div class="space-y-2 mt-4">
+                    <div class="p-3 bg-red-100 rounded-lg">
+                        <p class="font-semibold text-red-700">School Guidance Office:</p>
+                        <a href="tel:5551234567" class="text-xl font-bold text-red-600 hover:underline">(555) 123-4567</a>
+                    </div>
+                    <div class="p-3 bg-red-100 rounded-lg">
+                        <p class="font-semibold text-red-700">National Mental Health Hotline (Philippines):</p>
+                        <a href="tel:09663514510" class="text-xl font-bold text-red-600 hover:underline">0966 351 4510</a>
+                        <p class="text-sm text-gray-600">(Luzon-wide, Free of Charge)</p>
+                    </div>
+                </div>
+                <p class="text-sm italic mt-4">Confidentiality is assured. Your safety is the top priority.</p>
+            `);
+        }
+        window.showEmergencyContacts = showEmergencyContacts; // Expose globally
+
+        // --- Firebase Initialization and Auth ---
+
+        // Listener for data updates (called once auth is ready)
+        let journalUnsubscribe = null;
+        function initFirestoreListeners() {
+            if (!isOnline() || !userId || !db) return;
+
+            // Clean up previous listeners
+            if (journalUnsubscribe) journalUnsubscribe();
+
+            try {
+                // Use imported Firestore functions directly (no window prefix needed within module scope)
+                const journalCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/${COLLECTIONS.journal}`);
+                const q = query(journalCollectionRef, orderBy('timestamp', 'desc'), limit(50));
+
+                journalUnsubscribe = onSnapshot(q, (snapshot) => {
+                    journalLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    // Re-render the active view if it depends on journal logs (Home, Journal)
+                    if (currentView === 'journal') {
+                        renderJournalView(document.getElementById('view-container'));
+                    } else if (currentView === 'home') {
+                        renderHomeView(document.getElementById('view-container'));
+                    }
+                }, (error) => {
+                    console.error("Error fetching journal logs:", error);
+                    const statusEl = document.getElementById('journal-list-status');
+                    if (statusEl) statusEl.textContent = 'Error loading logs. Check connection.';
+                });
+            } catch (error) {
+                console.error("Failed to set up Firestore listeners:", error);
+            }
+        }
+        window.initFirestoreListeners = initFirestoreListeners; // Expose for testing if needed
+
+        // Core App Initialization wrapped in DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('app-loader');
+            const userIdDisplay = document.getElementById('user-id-display');
+
+            if (firebaseConfig) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    onAuthStateChanged(auth, async (user) => {
+                        if (!user) {
+                            // Sign in anonymously as there is no initial token in the local environment
+                            await signInAnonymously(auth);
+                        }
+                        
+                        if (auth.currentUser) {
+                             userId = auth.currentUser.uid;
+                             isAuthReady = true;
+                             if (userIdDisplay) userIdDisplay.textContent = userId;
+                             
+                             if (userId) {
+                                 initFirestoreListeners();
+                             }
+                        } else {
+                             if (userIdDisplay) userIdDisplay.textContent = 'Auth Failed';
+                             isAuthReady = true;
+                        }
+                        
+                        // Initial render once auth is ready
+                        navigate(currentView);
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.style.display = 'none', 500);
+                    });
+
+                } catch (error) {
+                    console.error("Firebase Initialization Error:", error);
+                    if (userIdDisplay) userIdDisplay.textContent = 'Error';
+                    isAuthReady = true; 
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                    navigate(currentView);
+                }
+            } else {
+                console.warn("Firebase config not found. Data saving and Chatbot features will be unavailable.");
+                isAuthReady = true;
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+                if (userIdDisplay) userIdDisplay.textContent = 'Offline';
+                navigate(currentView);
+            }
+        });
+
+
+        // --- Firestore Data Operations ---
+
+        async function saveDataToFirestore(collectionKey, data) {
+            if (!isOnline()) {
+                showModal('Offline Error', 'You must be online to save data. Please check your network connection.');
+                return false;
+            }
+            if (!userId) {
+                showModal('System Error', 'Authentication not complete. Please wait a moment and try again.');
+                return false;
+            }
+
+            try {
+                const collectionPath = `artifacts/${appId}/users/${userId}/${COLLECTIONS[collectionKey]}`;
+                await addDoc(collection(db, collectionPath), {
+                    ...data,
+                    timestamp: serverTimestamp(),
+                    userId: userId
+                });
+                return true;
+            } catch (error) {
+                console.error(`Error saving ${collectionKey}:`, error);
+                showModal('Save Failed', 'There was an error saving your data. Please try again or check the console for details.');
+                return false;
+            }
+        }
+        window.saveDataToFirestore = saveDataToFirestore; // Expose for form handlers
+
+
+        // --- 1. Home View (Dashboard) ---
+        function renderHomeView(container) {
+            const latestMood = getLatestMoodData();
+            const lastCheckIn = latestMood ? `${latestMood.mood} on ${latestMood.date}` : 'No check-in yet.';
+            const lastCheckInEmoji = latestMood ? getMoodEmoji(latestMood.mood) : '✍️';
+            const onlineStatus = isOnline();
+            
+            const hour = new Date().getHours();
+            let greeting = "Welcome";
+            if (hour < 12) greeting = "Good morning";
+            else if (hour < 18) greeting = "Good afternoon";
+            else greeting = "Good evening";
+
+            container.innerHTML = `
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-2">${greeting}, welcome to your space.</h2>
+                    <p class="text-lg text-gray-600 mb-8">Here's a gentle overview of your wellness journey.</p>
+                    
+                    <div class="p-6 mb-8 bg-indigo-50 border border-indigo-200 rounded-xl">
+                        <h3 class="text-xl font-bold text-indigo-700 mb-2">Today's Intention</h3>
+                        <p class="text-gray-700">"I will be kind to myself today and acknowledge that my feelings are valid."</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 border-t pt-8">
+                        <!-- Card 1: Last Mood Check-In -->
+                        <div class="p-6 bg-green-50 rounded-xl border border-green-200 flex flex-col">
+                            <div class="flex items-center mb-3">
+                                <div class="text-2xl p-3 bg-green-200 text-green-700 rounded-full mr-4">${lastCheckInEmoji}</div>
+                                <div>
+                                    <p class="text-sm font-semibold text-green-700 uppercase">Last Check-In</p>
+                                    <p class="text-lg font-bold text-gray-800">${lastCheckIn}</p>
+                                </div>
+                            </div>
+                            <button onclick="window.navigate('journal')" class="mt-auto text-sm text-green-600 hover:text-green-800 font-semibold self-start">
+                                View Journal &rarr;
+                            </button>
+                        </div>
+
+                        <!-- Card 2: Assessment Status -->
+                        <div class="p-6 bg-yellow-50 rounded-xl border border-yellow-200 flex flex-col">
+                            <div class="flex items-center mb-3">
+                                <div class="text-2xl p-3 bg-yellow-200 text-yellow-700 rounded-full mr-4">📝</div>
+                                <div>
+                                    <p class="text-sm font-semibold text-yellow-700 uppercase">Guided Check-ins</p>
+                                    <p class="text-lg font-bold text-gray-800">Ready to Take</p>
+                                </div>
+                            </div>
+                            <button onclick="window.navigate('assessment')" class="mt-auto text-sm text-yellow-600 hover:text-yellow-800 font-semibold self-start">
+                                Begin Check-in &rarr;
+                            </button>
+                        </div>
+                        
+                        <!-- Card 3: AI Support -->
+                        <div class="p-6 bg-indigo-50 rounded-xl border border-indigo-200 flex flex-col">
+                            <div class="flex items-center mb-3">
+                                <div class="text-2xl p-3 bg-indigo-200 text-indigo-700 rounded-full mr-4">🤖</div>
+                                <div>
+                                    <p class="text-sm font-semibold text-indigo-700 uppercase">Aura AI</p>
+                                    <p class="text-lg font-bold text-gray-800">${onlineStatus ? 'Online & Ready' : 'Offline'}</p>
+                                </div>
+                            </div>
+                            <button onclick="window.navigate('chatbot')" class="mt-auto text-sm text-indigo-600 hover:text-indigo-800 font-semibold self-start disabled:opacity-50" ${!onlineStatus ? 'disabled' : ''}>
+                                Start Chat &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 border-t pt-6">Quick Actions</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-gray-100 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 border border-transparent transition-all cursor-pointer flex items-center" onclick="window.navigate('journal')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M9 11h.01M9 15h.01M16 11h.01M16 15h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="font-medium text-gray-700">Log Today's Mood</span>
+                        </div>
+                        <div class="p-4 bg-gray-100 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 border border-transparent transition-all cursor-pointer flex items-center" onclick="window.navigate('resources')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4m-4-4H4"/></svg>
+                            <span class="font-medium text-gray-700">Explore Wellness Resources</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        /**
+         * Helper function to get a simple emoji representation for a mood.
+         */
+        function getMoodEmoji(mood) {
+            switch(mood) {
+                case 'Great': return '😊';
+                case 'Good': return '🙂';
+                case 'Neutral': return '😐';
+                case 'Stressed': return '😰';
+                case 'Anxious': return '😟';
+                case 'Sad': return '😔';
+                case 'Tired': return '😴';
+                case 'Angry': return '😠';
+                default: return '✍️';
+            }
+        }
+
+
+        // --- 2. Chatbot View (AI Support) ---
+        function createChatBubble(text, role) {
+            const bubble = document.createElement('div');
+            const isUser = role === 'user';
+            bubble.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            
+            const content = document.createElement('div');
+            content.className = `max-w-xs md:max-w-md p-4 shadow ${isUser ? 'chat-bubble-user' : 'chat-bubble-ai'}`;
+            
+            const textNode = document.createElement('p');
+            textNode.innerHTML = text.replace(/\n/g, '<br>'); // Preserve line breaks
+            content.appendChild(textNode);
+
+            if (role === 'loading') {
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'flex items-center mt-2';
+                const pulse = document.createElement('div');
+                pulse.className = 'ai-pulse mr-2';
+                statusDiv.appendChild(pulse);
+                const statusText = document.createElement('span');
+                statusText.className = 'text-xs text-gray-500';
+                statusText.textContent = 'Aura is typing...';
+                statusDiv.appendChild(statusText);
+                content.appendChild(statusDiv);
+            }
+            
+            bubble.appendChild(content);
+            return bubble;
+        }
+
+        function renderChatbotView(container) {
+            const onlineStatus = isOnline();
+            container.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-lg flex flex-col h-[70vh]">
+                    <div class="p-4 border-b border-gray-100 flex items-center">
+                        <div class="ai-pulse mr-3"></div>
+                        <h2 class="text-2xl font-bold text-indigo-700">Aura AI Support</h2>
+                    </div>
+
+                    <!-- Chat Window -->
+                    <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4">
+                        <div class="flex justify-start">
+                            <div class="max-w-xs md:max-w-md p-4 shadow-sm chat-bubble-ai">
+                                <p>Hi there! I'm Aura, your confidential mental wellness companion. I'm here to listen, without judgment, in English or Tagalog. How are you feeling today?</p>
+                                <p class="text-xs text-gray-500 mt-2">Status: <span id="chatbot-status">${onlineStatus ? 'Online' : 'Offline Mode (Chat Unavailable)'}</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="p-4 border-t border-gray-100 flex items-center">
+                        <input type="text" id="chat-input" placeholder="${onlineStatus ? 'Type your thoughts here... (English or Tagalog)' : 'Chat is unavailable while offline.'}" 
+                            class="flex-1 p-3 border border-gray-300 rounded-l-xl focus:ring-2 focus:ring-indigo-500 transition-shadow disabled:bg-gray-100"
+                            ${!onlineStatus ? 'disabled' : ''} onkeydown="if (event.key === 'Enter') window.sendMessage()">
+                        <button id="chat-send-btn" onclick="window.sendMessage()" 
+                            class="bg-indigo-600 text-white p-3 rounded-r-xl hover:bg-indigo-700 transition-colors flex items-center disabled:bg-gray-400"
+                            ${!onlineStatus ? 'disabled' : ''}>
+                            Send
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            // Restore chat history
+            const chatWindow = document.getElementById('chat-window');
+            chatHistory.forEach(msg => chatWindow.appendChild(createChatBubble(msg.text, msg.role)));
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        async function sendMessage() {
+            if (!isOnline()) {
+                showModal('Offline Mode', 'The AI Chatbot requires an active internet connection to function.');
+                return;
+            }
+
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (text === '') return;
+
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('chat-send-btn').disabled = true;
+            
+            const chatWindow = document.getElementById('chat-window');
+            
+            // 1. Add User Message
+            chatHistory.push({ role: 'user', text: text });
+            chatWindow.appendChild(createChatBubble(text, 'user'));
+            
+            // 2. Add AI Loading Message
+            const loadingBubble = createChatBubble('', 'loading');
+            chatWindow.appendChild(loadingBubble);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            try {
+                const systemPrompt = "You are 'Aura', a highly empathetic and confidential mental health support chatbot designed for students. Your primary role is to listen, offer compassionate, non-judgemental support, and encourage the user to express themselves comfortably. You must be fluent in both English and Tagalog (Filipino). If the user seems to be speaking Tagalog, respond primarily in Tagalog, and vice versa. Keep responses concise and focused on validation and open-ended questions. CRISIS DETECTION: If you detect any immediate sign of crisis (e.g., talk of self-harm, severe despair, or intent to harm others), you must immediately interrupt with an URGENT ALERT, gently and firmly advise them to use the Emergency Contact button, and provide the school and national hotline numbers prominently. Do NOT give medical advice or clinical diagnoses. Maintain confidentiality.";
+                
+                // Format chat history for API call
+                const apiHistory = chatHistory.map(msg => ({
+                    role: msg.role === 'user' ? 'user' : 'model',
+                    parts: [{ text: msg.text }]
+                }));
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
+                
+                const payload = {
+                    contents: apiHistory,
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+                
+                const response = await fetchWithExponentialBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text || "I apologize, I'm having trouble connecting right now. Please try again or use the Emergency Contact button if urgent.";
+                
+                // 3. Update AI Bubble
+                chatHistory.push({ role: 'model', text: aiText });
+                chatWindow.removeChild(loadingBubble); // Remove loading state
+                chatWindow.appendChild(createChatBubble(aiText, 'model')); // Add final response
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+
+                // Simple crisis detection based on AI's response (since system instruction is designed to embed the alert)
+                if (aiText.toUpperCase().includes("URGENT ALERT") || aiText.toUpperCase().includes("EMERGENCY CONTACT")) {
+                    showEmergencyContacts();
+                }
+
+            } catch (error) {
+                console.error('Gemini API Error:', error);
+                const errorText = "I encountered an error. Please check your network or try again later. (Error details in console)";
+                chatHistory.push({ role: 'model', text: errorText });
+                chatWindow.removeChild(loadingBubble);
+                chatWindow.appendChild(createChatBubble(errorText, 'model'));
+            } finally {
+                input.disabled = false;
+                document.getElementById('chat-send-btn').disabled = false;
+                input.focus();
+            }
+        }
+        window.sendMessage = sendMessage; // Expose globally
+
+        async function fetchWithExponentialBackoff(url, options, maxRetries = 5) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status !== 429) {
+                        return response;
+                    }
+                    // If 429 (Too Many Requests), wait and retry
+                    const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    // Wait before next retry
+                    const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+            throw new Error('API request failed after multiple retries.');
+        }
+
+
+        // --- 3. Assessment View (PHQ-9 and GAD-7) ---
+        const PHQ9_QUESTIONS = [
+            "Little interest or pleasure in doing things",
+            "Feeling down, depressed, or hopeless",
+            "Trouble falling or staying asleep, or sleeping too much",
+            "Feeling tired or having little energy",
+            "Poor appetite or overeating",
+            "Feeling bad about yourself—or that you are a failure or have let yourself or your family down",
+            "Trouble concentrating on things, such as reading the newspaper or watching television",
+            "Moving or speaking so slowly that other people could have noticed. Or the opposite—being so fidgety or restless that you have been moving around a lot more than usual",
+            "Thoughts that you would be better off dead or of hurting yourself in some way"
+        ];
+
+        const GAD7_QUESTIONS = [
+            "Feeling nervous, anxious, or on edge",
+            "Not being able to stop or control worrying",
+            "Worrying too much about different things",
+            "Trouble relaxing",
+            "Being so restless that it's hard to sit still",
+            "Becoming easily annoyed or irritable",
+            "Feeling afraid as if something awful might happen"
+        ];
+
+        const SCORES = [
+            { label: "Not at all", value: 0 },
+            { label: "Several days", value: 1 },
+            { label: "More than half the days", value: 2 },
+            { label: "Nearly every day", value: 3 }
+        ];
+        
+        // Expose handlers globally for HTML onclick
+        window.handleAnswer = handleAnswer;
+        window.switchTest = switchTest;
+        window.resetAssessment = resetAssessment;
+
+
+        function handleAnswer(score) {
+            const currentScores = assessmentState.test === 'phq9' ? assessmentState.phq9_scores : assessmentState.gad7_scores;
+            currentScores[assessmentState.qIndex] = score;
+            assessmentState.qIndex++;
+            renderCurrentAssessment();
+        }
+
+        function calculateCurrentScore() {
+            const currentScores = assessmentState.test === 'phq9' ? assessmentState.phq9_scores : assessmentState.gad7_scores;
+            return currentScores.reduce((acc, val) => acc + val, 0);
+        }
+        
+        function resetAssessment() {
+            if (assessmentState.test === 'phq9') {
+                assessmentState.phq9_scores.fill(0);
+            } else {
+                assessmentState.gad7_scores.fill(0);
+            }
+            assessmentState.qIndex = 0;
+            renderCurrentAssessment();
+        }
+
+        function switchTest(newTest) {
+            if (newTest === assessmentState.test) return;
+            assessmentState.test = newTest;
+            assessmentState.qIndex = 0; // Reset index for new test
+            renderCurrentAssessment();
+        }
+
+        function renderAssessmentCard(container) {
+            const questions = assessmentState.test === 'phq9' ? PHQ9_QUESTIONS : GAD7_QUESTIONS;
+            const index = assessmentState.qIndex;
+            const total = questions.length;
+            const question = questions[index];
+            const currentScore = calculateCurrentScore();
+
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 min-h-[300px] flex flex-col justify-between transition-opacity duration-300">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 mb-2">${assessmentState.test.toUpperCase()} | Question ${index + 1} of ${total}</p>
+                        <p class="text-2xl font-bold text-gray-800 mb-6">${question}?</p>
+                    </div>
+
+                    <!-- Score Options -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                        ${SCORES.map((score, i) => `
+                            <button onclick="window.handleAnswer(${score.value})" 
+                                class="score-btn score-btn-${score.value}">
+                                <span class="block text-xl">${score.value}</span>
+                                <span class="block text-sm font-light">${score.label}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-500">Current running score: <strong>${currentScore}</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAssessmentResult(container, testId, totalScore) {
+            let interpretation = '';
+            let colorClass = 'bg-blue-100 text-blue-700';
+            const title = testId === 'phq9' ? 'PHQ-9 (Depressive Symptoms)' : 'GAD-7 (Anxiety Symptoms)';
+            const testColor = testId === 'phq9' ? 'text-indigo-700' : 'text-green-700';
+            
+            if (testId === 'phq9') {
+                if (totalScore <= 4) { interpretation = 'Minimal depression. Great job on self-care!'; colorClass = 'bg-green-100 text-green-700'; }
+                else if (totalScore <= 9) { interpretation = 'Mild depression. Self-care and resource review are recommended.'; colorClass = 'bg-yellow-100 text-yellow-700'; }
+                else if (totalScore <= 14) { interpretation = 'Moderate depression. Consider booking an appointment with a counselor.'; colorClass = 'bg-orange-100 text-orange-700'; }
+                else if (totalScore <= 19) { interpretation = 'Moderately severe depression. Seeking professional help is highly recommended.'; colorClass = 'bg-red-100 text-red-700'; }
+                else { interpretation = 'Severe depression. Please reach out to your school counselor or use the Emergency Contact button immediately.'; colorClass = 'bg-red-100 text-red-700 font-bold'; showEmergencyContacts(); }
+            } else { // GAD-7 (Anxiety)
+                if (totalScore <= 4) { interpretation = 'Minimal anxiety. Your worry levels are manageable.'; colorClass = 'bg-green-100 text-green-700'; }
+                else if (totalScore <= 9) { interpretation = 'Mild anxiety. Focus on stress reduction techniques.'; colorClass = 'bg-yellow-100 text-yellow-700'; }
+                else if (totalScore <= 14) { interpretation = 'Moderate anxiety. Consider booking an appointment with a counselor.'; colorClass = 'bg-orange-100 text-orange-700'; }
+                else { interpretation = 'Severe anxiety. Seeking professional help is highly recommended. If distress is severe, use the Emergency Contact button.'; colorClass = 'bg-red-100 text-red-700 font-bold'; }
+            }
+
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 min-h-[300px] flex flex-col justify-center items-center text-center">
+                    <h3 class="text-3xl font-extrabold ${testColor} mb-4">${title} Results</h3>
+                    <div class="text-6xl font-bold mb-4">${totalScore}</div>
+                    
+                    <div class="p-4 rounded-xl w-full max-w-sm ${colorClass}">
+                        <p class="text-xl font-bold mb-2">Score Interpretation:</p>
+                        <p class="text-lg">${interpretation}</p>
+                    </div>
+                    
+                    <p class="mt-4 text-sm italic text-gray-600">This is not a diagnosis. A counselor can provide personalized guidance.</p>
+                    
+                    <button onclick="window.resetAssessment()" class="mt-6 py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors">
+                        Retake ${testId.toUpperCase()}
+                    </button>
+                    <button onclick="window.navigate('forms')" class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                        Request Counseling Appointment &rarr;
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderCurrentAssessment() {
+            const container = document.getElementById('flashcard-container');
+            if (container) {
+                const questions = assessmentState.test === 'phq9' ? PHQ9_QUESTIONS : GAD7_QUESTIONS;
+                
+                if (assessmentState.qIndex >= questions.length) {
+                    renderAssessmentResult(container, assessmentState.test, calculateCurrentScore());
+                } else {
+                    renderAssessmentCard(container);
+                }
+            }
+            // Update Tab Styling
+            document.querySelectorAll('.assessment-tab').forEach(tab => {
+                if (tab.id === `${assessmentState.test}-tab`) {
+                    tab.classList.remove('bg-gray-200', 'text-gray-700');
+                    tab.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                } else {
+                    tab.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                    tab.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                }
+            });
+        }
+
+
+        function renderAssessmentView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Guided Wellness Check-in</h2>
+                    <p class="text-gray-600">Answer each question based on how often you have been bothered by the issue over the past **two weeks**.</p>
+                    
+                    <!-- Test Selector Tabs -->
+                    <div class="flex space-x-4 border-b pb-4">
+                        <button id="phq9-tab" onclick="window.switchTest('phq9')" class="assessment-tab py-2 px-4 rounded-lg font-bold transition-colors">
+                            PHQ-9 (Depressive)
+                        </button>
+                        <button id="gad7-tab" onclick="window.switchTest('gad7')" class="assessment-tab py-2 px-4 rounded-lg font-bold transition-colors">
+                            GAD-7 (Anxiety)
+                        </button>
+                    </div>
+
+                    <!-- Flashcard/Result Container -->
+                    <div id="flashcard-container" class="mt-4">
+                        <!-- Content injected here by renderCurrentAssessment -->
+                    </div>
+                </div>
+            `;
+            // Initial render of the active test
+            renderCurrentAssessment();
+        }
+
+        // --- 4. Journal/Mood Tracking View ---
+
+        async function handleJournalSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const mood = form.mood.value;
+            const notes = form.notes.value;
+
+            const success = await saveDataToFirestore('journal', {
+                mood,
+                notes,
+                date: new Date().toISOString().split('T')[0] // Simple date for display
+            });
+
+            if (success) {
+                form.reset();
+                document.getElementById('notes-char-count').textContent = '0/1000';
+                showModal('Success', 'Your mood and journal entry have been saved securely!');
+                // onSnapshot listener will handle the re-render of logs and the dashboard
+            }
+        }
+        
+        function renderMotivationalInsight(latestMood) {
+            const insightDiv = document.getElementById('motivational-insight');
+            if (!insightDiv) return;
+
+            let message = '';
+            let color = 'bg-gray-100 text-gray-700';
+
+            if (!latestMood) {
+                insightDiv.classList.add('hidden');
+                return;
+            }
+
+            const mood = latestMood.mood;
+
+            switch (mood) {
+                case 'Great':
+                case 'Good':
+                    message = "That's fantastic! Remember what made today great and try to incorporate more of it into your week. Keep shining! ✨";
+                    color = 'bg-green-100 text-green-800';
+                    break;
+                case 'Neutral':
+                    message = "Sometimes 'neutral' is a quiet victory. It's okay to just exist. Maybe a small change could brighten things up? Take a moment for yourself. ☕";
+                    color = 'bg-blue-100 text-blue-800';
+                    break;
+                case 'Stressed':
+                case 'Tired':
+                    message = "Feeling worn out is a sign you need a break. Remember, rest is productive. Try a 5-minute deep breathing exercise right now. 🧘";
+                    color = 'bg-yellow-100 text-yellow-800';
+                    break;
+                case 'Anxious':
+                    message = "Anxiety is tough, but you are tougher. Focus on what you can control right now. If you need immediate, non-judgmental support, chat with Aura AI. 💬";
+                    color = 'bg-orange-100 text-orange-800';
+                    break;
+                case 'Sad':
+                case 'Angry':
+                    message = "It's completely valid to feel sad or angry. Acknowledge the feeling without judgment, then try writing out 3 things you are grateful for. You'll get through this. 💖";
+                    color = 'bg-red-100 text-red-800';
+                    break;
+                default:
+                    message = "Keep checking in! Consistency is key to understanding your emotional patterns.";
+                    break;
+            }
+
+            insightDiv.className = `my-2 p-3 rounded-lg text-sm ${color}`;
+            insightDiv.innerHTML = `<h4 class="font-bold mb-1">A Little Encouragement:</h4><p>${message}</p>`;
+            insightDiv.classList.remove('hidden');
+        }
+
+        let moodChartInstance = null; // To hold the chart object
+        function renderMoodChart() {
+            const container = document.getElementById('mood-chart-container');
+            if (!container) return;
+
+            if (!journalLogs || journalLogs.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 p-4">Log your mood to see your trend chart here!</p>`;
+                return;
+            }
+
+            // Map moods to numerical values for charting
+            const moodScores = { 'Great': 5, 'Good': 4, 'Neutral': 3, 'Stressed': 2, 'Anxious': 2, 'Sad': 1, 'Tired': 1, 'Angry': 0 };
+            
+            // Reverse logs to show oldest to newest, and take the last 15 for clarity
+            const chartLogs = [...journalLogs].reverse().slice(-15); 
+
+            const labels = chartLogs.map(log => log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A');
+            const data = chartLogs.map(log => moodScores[log.mood] ?? 3); // Default to 'Neutral' if mood is unknown
+
+            // Destroy previous chart instance if it exists
+            if (moodChartInstance) {
+                moodChartInstance.destroy();
+            }
+
+            container.innerHTML = `<canvas id="moodChart"></canvas>`;
+            const ctx = document.getElementById('moodChart').getContext('2d');
+            
+            moodChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{
+                    label: 'Mood Score',
+                    data,
+                    fill: true,
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                    borderColor: 'rgba(99, 102, 241, 1)',
+                    tension: 0.3
+                }]},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, max: 5, ticks: { stepSize: 1, callback: (value) => ['Angry', 'Sad/Tired', 'Stressed', 'Neutral', 'Good', 'Great'][value] } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderJournalView(container) {
+            const onlineStatus = isOnline();
+            const latestMood = getLatestMoodData();
+            
+            container.innerHTML = `
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">Mood & Journal Dashboard</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Left Column: Journal Form -->
+                        <div class="p-6 bg-gray-50 rounded-xl">
+                            <h3 class="text-xl font-semibold text-indigo-700 mb-4">Daily Check-In (Requires Internet)</h3>
+                            <form id="journal-form" class="space-y-4">
+                                <div class="space-y-2">
+                                    <label for="mood" class="block font-medium text-gray-700">How would you rate your mood today?</label>
+                                    <select id="mood" name="mood" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                        <option value="" disabled selected>Select an emotion...</option>
+                                        <option value="Great">Great (Feeling motivated and happy)</option>
+                                        <option value="Good">Good (Stable and positive)</option>
+                                        <option value="Neutral">Neutral (Just okay)</option>
+                                        <option value="Stressed">Stressed (Overwhelmed or pressured)</option>
+                                        <option value="Anxious">Anxious (Nervous, worried, or restless)</option>
+                                        <option value="Sad">Sad (Down, blue, or low)</option>
+                                        <option value="Tired">Tired (Low energy, difficulty focusing)</option>
+                                        <option value="Angry">Angry (Frustrated or irritable)</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="notes" class="block font-medium text-gray-700">Journal Entry (Optional)</label>
+                                    <textarea id="notes" name="notes" rows="4" maxlength="1000" placeholder="Write down anything you want to reflect on..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                                    <p class="text-sm text-gray-500 float-right" id="notes-char-count">0/1000</p>
+                                </div>
+                                <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400"
+                                    ${!onlineStatus ? 'disabled' : ''}>
+                                    Log Mood & Save Entry
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right Column: Widgets -->
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <!-- Mood Calendar Tracker -->
+                                <div class="p-4 bg-gray-50 rounded-xl">
+                                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Mood Calendar</h3>
+                                    <div id="mood-calendar-container"></div>
+                                </div>
+                                <!-- Anti-Stress Breathing Game -->
+                                <div class="p-4 bg-gray-50 rounded-xl">
+                                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Breathing Guide</h3>
+                                    <div id="breathing-game-container"></div>
+                                </div>
+                            </div>
+
+                            <!-- Mood Trend History -->
+                            <div class="p-4 bg-gray-50 rounded-xl">
+                                <h3 class="text-lg font-semibold text-gray-700 mb-2">Mood Trend History</h3>
+                                <div id="motivational-insight" class="my-2 p-3 rounded-lg hidden text-sm"></div>
+                                <div id="mood-chart-container" class="relative h-48">
+                                    <!-- Chart will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('notes').addEventListener('input', (e) => {
+                document.getElementById('notes-char-count').textContent = `${e.target.value.length}/1000`;
+            });
+
+            document.getElementById('journal-form').addEventListener('submit', handleJournalSubmit);
+            
+            // Render data and insights after setting up the DOM elements
+            renderMoodChart();
+            renderMotivationalInsight(latestMood);
+            renderMoodCalendar();
+            renderBreathingGame(); 
+        }
+
+        function renderMoodCalendar() {
+            const container = document.getElementById('mood-calendar-container');
+            if (!container) return;
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const daysInMonth = lastDayOfMonth.getDate();
+            const startDayOfWeek = firstDayOfMonth.getDay(); // 0=Sun, 1=Mon,...
+
+            // Create a map of date strings to mood emojis for quick lookup
+            const moodMap = new Map();
+            journalLogs.forEach(log => {
+                if (log.timestamp) {
+                    const logDate = new Date(log.timestamp.seconds * 1000);
+                    // Only consider logs from the current month and year
+                    if (logDate.getFullYear() === year && logDate.getMonth() === month) {
+                        const dateKey = logDate.toISOString().split('T')[0];
+                        moodMap.set(dateKey, getMoodEmoji(log.mood));
+                    }
+                }
+            });
+
+            let calendarHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-indigo-700">${now.toLocaleString('default', { month: 'long', year: 'numeric' })}</h4>
+                </div>
+                <div class="mood-calendar-grid text-center font-semibold text-gray-500 text-xs">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div class="mood-calendar-grid mt-2">
+            `;
+
+            // Add empty cells for days before the 1st of the month
+            for (let i = 0; i < startDayOfWeek; i++) {
+                calendarHTML += `<div class="mood-calendar-day other-month"></div>`;
+            }
+
+            // Add cells for each day of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const moodEmoji = moodMap.get(dateKey);
+                if (moodEmoji) {
+                    calendarHTML += `<div class="mood-calendar-day has-mood" title="Mood: ${moodEmoji}">${moodEmoji}</div>`;
+                } else {
+                    calendarHTML += `<div class="mood-calendar-day">${day}</div>`;
+                }
+            }
+            calendarHTML += `</div>`;
+            container.innerHTML = calendarHTML;
+        }
+
+        function renderBreathingGame() {
+            const container = document.getElementById('breathing-game-container');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full min-h-[180px] text-center">
+                    <div class="relative w-24 h-24 flex items-center justify-center">
+                        <div class="absolute w-full h-full bg-indigo-200 rounded-full breathing-circle"></div>
+                        <p id="breathing-text" class="relative text-lg font-bold text-indigo-800">Get Ready...</p>
+                    </div> 
+                </div>
+            `;
+            const textEl = document.getElementById('breathing-text');
+            setInterval(() => { textEl.textContent = 'Breathe In...'; setTimeout(() => { textEl.textContent = 'Breathe Out...'; }, 4000); }, 8000);
+        }
+
+        // --- 5. Psychological Resource Center (EXPANDED CONTENT & TABBED UI) ---
+        
+        const RESOURCES = [
+            { 
+                id: 'emotional', 
+                title: 'Emotional Health', 
+                icon: '🧠', 
+                color: 'text-indigo-700 border-indigo-500', 
+                bg: 'bg-indigo-50',
+                content: [
+                    { 
+                        sectionTitle: "Understanding Your Feelings", 
+                        body: "Learning to name and validate your emotions is the first step toward managing them. Emotions are simply data, not commands. You can feel something without having to act on it.",
+                        tips: [
+                            "Perform a daily 'body scan' to check where you hold tension.", 
+                            "Use the Mood Tracker to identify patterns in your emotional landscape.", 
+                            "Distinguish between a temporary 'sad mood' and persistent 'depressive symptoms' (use the PHQ-9 assessment)."
+                        ]
+                    },
+                    {
+                        sectionTitle: "Self-Compassion Practices",
+                        body: "Treat yourself with the same kindness and understanding you would offer a friend. Self-compassion is not self-pity; it's recognizing that imperfection and suffering are part of the shared human experience.",
+                        tips: [
+                            "Write a kind, supportive note to yourself when you're struggling.",
+                            "Acknowledge when you are suffering without judgment (Mindfulness).",
+                            "Challenge your inner critic with compassionate self-talk—ask if the criticism is helpful or simply harsh."
+                        ]
+                    }
+                ]
+            },
+            { 
+                id: 'stress', 
+                title: 'Academic Stress', 
+                icon: '📚', 
+                color: 'text-green-700 border-green-500', 
+                bg: 'bg-green-50',
+                content: [
+                    { 
+                        sectionTitle: "Effective Time Management", 
+                        body: "Overwhelm often comes from unclear priorities and poor planning. Structured planning reduces anxiety by making large tasks feel manageable.",
+                        tips: [
+                            "The Pomodoro Technique: 25 minutes of focus, 5 minutes of rest.", 
+                            "Eat the Frog: Tackle your most difficult task first thing in the morning.", 
+                            "Set clear, small goals (SMART goals) instead of vague resolutions."
+                        ]
+                    },
+                    {
+                        sectionTitle: "Combating Burnout",
+                        body: "Burnout is chronic, unmanaged work-related stress. It manifests as exhaustion, cynicism, and reduced efficacy. It requires more than just a weekend off.",
+                        tips: [
+                            "Set firm boundaries and learn to say 'No' to non-essential commitments.",
+                            "Ensure you have a complete digital detox period daily (no screens 1 hour before bed).",
+                            "Prioritize sleep and nutrition—they are the foundation of resilience, not a reward for success."
+                        ]
+                    }
+                ]
+            },
+            { 
+                id: 'tools', 
+                title: 'Coping Tools', 
+                icon: '🛠️', 
+                color: 'text-yellow-700 border-yellow-500', 
+                bg: 'bg-yellow-50',
+                content: [
+                    { 
+                        sectionTitle: "Grounding Techniques for Anxiety", 
+                        body: "Grounding brings your focus back to the present moment when anxious thoughts or panic symptoms are overwhelming. It interrupts the cycle of catastrophic thinking.",
+                        tips: [
+                            "5-4-3-2-1 Method: Name 5 things you see, 4 you feel, 3 you hear, 2 you smell, and 1 you taste.", 
+                            "Deep Breathing: Use the Breathing Guide on the Journal tab (or 4-second inhale, 6-second exhale).", 
+                            "Physical Anchors: Hold an ice cube, run cold water on your wrists, or lightly tap your fingers."
+                        ]
+                    },
+                    {
+                        sectionTitle: "Journaling and Reflection",
+                        body: "Writing down your thoughts helps externalize problems and clear mental space. It allows you to observe your issues rather than being consumed by them.",
+                        tips: [
+                            "Focus on facts, not just feelings (What happened? What did I do?).",
+                            "Write a 'brain dump' of everything you need to do or are worried about to clear your mind.",
+                            "Practice gratitude journaling: Write down three things you are genuinely thankful for each day."
+                        ]
+                    }
+                ]
+            },
+            { 
+                id: 'crisis', 
+                title: 'Crisis & Help', 
+                icon: '🚨', 
+                color: 'text-red-700 border-red-500', 
+                bg: 'bg-red-50',
+                content: [
+                    { 
+                        sectionTitle: "Signs You Need Immediate Help", 
+                        body: "If you are experiencing thoughts of self-harm, have a plan to end your life, or feel you are a danger to yourself or others, please stop and contact emergency services immediately. Your life is valuable.",
+                        tips: [
+                            "National Hotline (PH): 0966 351 4510", 
+                            "School Guidance Office: (555) 123-4567", 
+                            "Use the red 'EMERGENCY HELP' button on the screen for quick access to contacts."
+                        ]
+                    },
+                    {
+                        sectionTitle: "What to Expect from Counseling",
+                        body: "Counseling provides a safe, non-judgmental, and confidential space to explore difficulties, develop coping skills, and gain new perspectives.",
+                        tips: [
+                            "Counseling is strictly confidential (except for mandated reporting of harm).",
+                            "You are in charge of what you discuss; counselors follow your lead.",
+                            "It's okay if you don't 'click' with the first counselor; fit is important for success."
+                        ]
+                    }
+                ]
+            }
+        ];
+        
+        let activeResourceTab = RESOURCES[0].id; // Set initial tab
+
+        /**
+         * Switches the active resource tab and re-renders content.
+         */
+        function switchResourceTab(tabId) {
+            activeResourceTab = tabId;
+            
+            // 1. Rerender the content area only
+            const contentContainer = document.getElementById('resource-content-container');
+            if (contentContainer) {
+                renderResourceContent(contentContainer);
+            }
+            
+            // 2. Update button styles
+            document.querySelectorAll('.resource-tab-btn').forEach(btn => {
+                if (btn.id === `tab-${tabId}`) {
+                    btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+        }
+        window.switchResourceTab = switchResourceTab; // Expose globally
+
+        /**
+         * Renders the content of the active tab into the container.
+         */
+        function renderResourceContent(container) {
+            const activeData = RESOURCES.find(r => r.id === activeResourceTab);
+            if (!activeData) return;
+
+            // Render each section within the active tab
+            container.innerHTML = activeData.content.map(section => `
+                <div class="border-b border-gray-100 last:border-b-0 py-4">
+                    <h4 class="text-xl font-bold text-gray-800 mb-2 flex items-center">
+                        <span class="${activeData.color.split(' ')[0]} mr-2">${activeData.icon}</span> ${section.sectionTitle}
+                    </h4>
+                    <p class="text-gray-600 mb-3">${section.body}</p>
+                    <div class="p-3 rounded-lg ${activeData.bg} border border-${activeData.color.split('-')[1]}-200">
+                        <h5 class="font-semibold text-sm ${activeData.color.split(' ')[0]} mb-1">Actionable Steps:</h5>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+                            ${section.tips.map(tip => `<li>${tip}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Scroll to the top when content changes
+            container.scrollTop = 0;
+        }
+
+
+        function renderResourcesView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">Your Wellness Library</h2>
+                    <p class="text-gray-600 mb-6">Browse curated, in-depth articles and **actionable strategies** organized by topic. This information is available even when offline!</p>
+                    
+                    <!-- Tab Buttons - Horizontal scrolling on mobile/wrapping on desktop -->
+                    <div class="flex overflow-x-auto whitespace-nowrap gap-3 mb-6 border-b pb-3">
+                        ${RESOURCES.map((res, index) => `
+                            <button id="tab-${res.id}" onclick="window.switchResourceTab('${res.id}')" 
+                                class="resource-tab-btn flex items-center flex-shrink-0 py-2 px-4 rounded-xl font-bold transition-colors text-sm
+                                ${index === 0 ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">
+                                ${res.icon} <span class="ml-2">${res.title}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Content Area - Fixed Height with Internal Scroll -->
+                    <div id="resource-content-container" class="space-y-6">
+                        <!-- Content will be injected here by renderResourceContent -->
+                    </div>
+
+                    <div class="mt-8 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg">
+                        <h3 class="font-bold text-red-700">A Gentle Reminder:</h3>
+                        <p class="text-sm text-red-600">These resources are for educational purposes and self-management. If your struggles feel overwhelming, please use the <a href="#" onclick="window.navigate('forms')" class="text-red-800 underline hover:no-underline font-semibold">Booking Form</a> for professional support or the Emergency Contact button for immediate help.</p>
+                    </div>
+                </div>
+            `;
+            // Initial render
+            renderResourceContent(document.getElementById('resource-content-container'));
+        }
+
+        // --- 6. Appointment Booking & Confidential Feedback Form ---
+
+        async function handleAppointmentSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                counselor: form.counselor.value,
+                date_pref: form.date_pref.value,
+                reason: form.reason.value,
+                status: 'Pending Review'
+            };
+
+            const success = await saveDataToFirestore('appointments', data);
+            if (success) {
+                form.reset();
+                showModal('Booking Submitted', 'Your appointment request has been sent to the guidance office. They will contact you via school email/system soon to confirm the schedule.');
+            }
+        }
+
+        async function handleFeedbackSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                name: form.name_optional.value || 'Anonymous',
+                type: form.feedback_type.value,
+                message: form.feedback_text.value,
+                status: 'New'
+            };
+
+            const success = await saveDataToFirestore('feedback', data);
+            if (success) {
+                form.reset();
+                showModal('Feedback Received', 'Thank you! Your feedback has been submitted securely and is greatly appreciated.');
+            }
+        }
+
+        function renderFormsView(container) {
+            const onlineStatus = isOnline();
+            container.innerHTML = `
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-2">Connect & Improve</h2>
+                    <p class="text-gray-600 mb-8">Request a confidential counseling session or share your feedback to help us enhance this platform for everyone.</p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        
+                        <!-- Left Side: Booking Form (takes 3/5 width on large screens) -->
+                        <div class="lg:col-span-3 p-6 bg-indigo-50 rounded-xl border border-indigo-200">
+                            <h3 class="text-2xl font-bold text-indigo-700 mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M9 11h.01M9 15h.01M16 11h.01M16 15h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Request a Counseling Session
+                            </h3>
+                            <p class="text-gray-600 mb-4 text-sm">All requests are confidential. A counselor will contact you to confirm your schedule.</p>
+                            <form id="appointment-form" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="counselor" class="block font-medium text-gray-700 text-sm">Preferred Counselor</label>
+                                        <select id="counselor" name="counselor" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+                                            <option value="Any" selected>Any Available Counselor</option>
+                                            <option value="Ms. Dela Cruz">Ms. Dela Cruz (Guidance)</option>
+                                            <option value="Mr. Reyes">Mr. Reyes (Psychology)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="date_pref" class="block font-medium text-gray-700 text-sm">Preferred Date</label>
+                                        <input type="date" id="date_pref" name="date_pref" required class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="reason" class="block font-medium text-gray-700 text-sm">Reason for Appointment (Briefly)</label>
+                                    <textarea id="reason" name="reason" rows="3" required placeholder="e.g., Stress management, anxiety symptoms, academic pressure..." class="w-full p-3 mt-1 border border-gray-300 rounded-lg"></textarea>
+                                </div>
+                                <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400"
+                                    ${!onlineStatus ? 'disabled title="Internet connection required"' : ''}>
+                                    Submit Booking Request
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right Side: Feedback Form (takes 2/5 width on large screens) -->
+                        <div class="lg:col-span-2 p-6 bg-gray-50 rounded-xl border border-gray-200">
+                            <h3 class="text-2xl font-bold text-gray-700 mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                                Share Your Feedback
+                            </h3>
+                            <p class="text-gray-600 mb-4 text-sm">Your input helps us improve. You can remain anonymous.</p>
+                            <form id="feedback-form" class="space-y-4">
+                                <div>
+                                    <label for="feedback_type" class="block font-medium text-gray-700 text-sm">Type of Feedback</label>
+                                    <select id="feedback_type" name="feedback_type" required class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+                                        <option value="Improvement">Suggestion for Improvement</option>
+                                        <option value="Concern">Confidential Concern</option>
+                                        <option value="Bug">Technical Issue (Bug)</option>
+                                        <option value="Positive">Positive Feedback</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="feedback_text" class="block font-medium text-gray-700 text-sm">Your Message</label>
+                                    <textarea id="feedback_text" name="feedback_text" rows="3" required placeholder="Write your feedback here..." class="w-full p-3 mt-1 border border-gray-300 rounded-lg"></textarea>
+                                </div>
+                                <div>
+                                    <label for="name_optional" class="block font-medium text-gray-700 text-sm">Your Name (Optional)</label>
+                                    <input type="text" id="name_optional" name="name_optional" placeholder="Leave blank to be anonymous" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+                                </div>
+                                <button type="submit" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400"
+                                    ${!onlineStatus ? 'disabled title="Internet connection required"' : ''}>
+                                    Submit Feedback
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- "After You Submit" Section -->
+                    <div class="mt-8 border-t pt-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">After You Submit</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-gray-100 rounded-lg">
+                                <h4 class="font-semibold text-gray-700 mb-2">What to Expect from Counseling:</h4>
+                                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                                    <li>A counselor will email you to confirm a time.</li>
+                                    <li>Sessions are a safe, non-judgmental space.</li>
+                                    <li>Everything you discuss is strictly confidential.</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 bg-gray-100 rounded-lg">
+                                <h4 class="font-semibold text-gray-700 mb-2">Your Recent Submissions:</h4>
+                                <p class="text-sm text-gray-500 text-center py-4">Your submitted requests and feedback will appear here. (Feature coming soon)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('appointment-form').addEventListener('submit', handleAppointmentSubmit);
+            document.getElementById('feedback-form').addEventListener('submit', handleFeedbackSubmit);
+        }
+    </script>
+</body>
+</html>
