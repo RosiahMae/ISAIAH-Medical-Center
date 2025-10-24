@@ -30,11 +30,6 @@
             100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
         }
         #emergency-button {
-            animation: pulse-shadow-red 2.5s infinite;
-        }
-        @keyframes pulse-shadow-red { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
-        
-        .chat-bubble-user {
             background-color: #3b82f6; /* Blue 500 */
             color: white;
             border-radius: 1.5rem 1.5rem 0.5rem 1.5rem;
@@ -142,27 +137,27 @@
         
         <div class="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-1">
             <!-- Navigation buttons call window.navigate, which is defined in the script module -->
-            <button onclick="window.navigate('home')" class="nav-item flex items-center p-3 text-indigo-700 rounded-xl hover:bg-indigo-100 transition-colors bg-indigo-100 font-semibold">
+            <button onclick="window.navigate('home')" class="nav-item flex items-center p-3 text-indigo-700 rounded-xl hover:bg-indigo-100 transition-colors bg-indigo-100 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                 <span class="hidden md:inline">My Space</span>
             </button>
-            <button onclick="window.navigate('chatbot')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+            <button onclick="window.navigate('chatbot')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                <span class="hidden md:inline">Talk with Aura</span>
+                <span class="hidden md:inline">Talk with Ilona</span>
             </button>
-            <button onclick="window.navigate('assessment')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+            <button onclick="window.navigate('assessment')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-9 0V3h10v2m-9 0h10"/></svg>
                 <span class="hidden md:inline">Guided Check-ins</span>
             </button>
-            <button onclick="window.navigate('journal')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+            <button onclick="window.navigate('journal')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"/></svg>
                 <span class="hidden md:inline">Mood & Journal</span>
             </button>
-            <button onclick="window.navigate('resources')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+            <button onclick="window.navigate('resources')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                 <span class="hidden md:inline">Wellness Library</span>
             </button>
-            <button onclick="window.navigate('forms')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors">
+            <button onclick="window.navigate('forms')" class="nav-item flex items-center p-3 text-gray-700 rounded-xl hover:bg-indigo-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M9 11h.01M9 15h.01M16 11h.01M16 15h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span class="hidden md:inline">Connect & Share</span>
             </button>
@@ -188,9 +183,8 @@
     </div>
 
     <!-- Emergency Contact Button (Fixed Position) -->
-    <button id="emergency-button" onclick="window.showEmergencyContacts()" class="fixed bottom-20 md:bottom-10 right-4 md:right-10 bg-red-600 text-white p-4 rounded-full shadow-2xl hover:bg-red-700 transition-transform transform hover:scale-105 z-20 flex items-center font-bold">
+    <button id="emergency-button" onclick="window.showEmergencyContacts()" aria-label="Emergency Help" class="fixed bottom-20 md:bottom-10 right-4 md:right-10 bg-red-600 text-white p-4 rounded-full shadow-2xl hover:bg-red-700 transition-transform transform hover:scale-105 z-20 flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span class="ml-2 hidden sm:inline">EMERGENCY HELP</span>
     </button>
     
     <!-- Custom Modal Container -->
@@ -221,6 +215,9 @@
         let isAuthReady = false;
         let chatHistory = [];
         let journalLogs = []; // Stores fetched journal entries
+        let appointmentLogs = []; // Stores fetched appointment requests
+        let feedbackLogs = []; // Stores fetched feedback submissions
+        let assessmentLogs = []; // Stores fetched assessment results
         
         // Assessment State
         let assessmentState = {
@@ -234,6 +231,7 @@
         // --- CONFIGURED FIREBASE & GEMINI KEYS ---
         // These keys were provided by the user for local execution.
         const GEMINI_API_KEY = "AIzaSyA_g7CNI4LPmAcZlmtyEKzCncJBruN7zNU";
+        const GEMINI_MODEL_NAME = "gemini-1.5-flash-preview-0514";
         const appId = 'student-wellness-hub-ddae5'; // Your Project ID
         const firebaseConfig = {
             apiKey: "AIzaSyAE_g-aE86v1q2CPk5lXgFctmiuxJYJv8E",
@@ -259,7 +257,8 @@
         const COLLECTIONS = {
             journal: 'mood_logs',
             appointments: 'appointments',
-            feedback: 'confidential_feedback'
+            feedback: 'confidential_feedback',
+            assessments: 'assessments'
         };
 
         // --- Core Helpers (Exposed to window for HTML `onclick`) ---
@@ -271,6 +270,15 @@
             return navigator.onLine && db;
         }
         window.isOnline = isOnline; // Expose globally
+
+        /**
+         * Re-renders the currently active view. Useful for refreshing data.
+         */
+        function refreshCurrentView() {
+            if (VIEW_MAP[currentView]) {
+                VIEW_MAP[currentView](document.getElementById('view-container'));
+            }
+        }
 
         /**
          * Returns the latest mood data from the fetched logs.
@@ -289,6 +297,65 @@
                 notes: latest.notes,
                 date: dateStr
             };
+        }
+
+        /**
+         * Returns the latest assessment data from the fetched logs.
+         * @returns {object|null} The latest assessment entry or null.
+         */
+        function getLatestAssessmentData() {
+            if (assessmentLogs.length === 0) return null;
+            // Logs are fetched ordered by timestamp descending
+            const latest = assessmentLogs[0];
+            const dateStr = latest.timestamp 
+                ? new Date(latest.timestamp.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                : 'N/A';
+            
+            return { ...latest, date: dateStr };
+        }
+
+        /**
+         * Calculates current and longest check-in streaks from journal logs.
+         * @returns {{current: number, longest: number}}
+         */
+        function calculateStreaks() {
+            if (!journalLogs || journalLogs.length === 0) {
+                return { current: 0, longest: 0 };
+            }
+
+            // Get unique dates in YYYY-MM-DD format, sorted from oldest to newest
+            const uniqueDates = [...new Set(journalLogs.map(log => new Date(log.timestamp.seconds * 1000).toISOString().split('T')[0]))].sort();
+
+            let currentStreak = 0;
+            let longestStreak = 0;
+
+            if (uniqueDates.length > 0) {
+                // Check if the last log was today or yesterday to determine current streak
+                const today = new Date();
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+
+                const lastLogDateStr = uniqueDates[uniqueDates.length - 1];
+                if (lastLogDateStr === today.toISOString().split('T')[0] || lastLogDateStr === yesterday.toISOString().split('T')[0]) {
+                    currentStreak = 1;
+                }
+
+                // Iterate from second to last date to calculate streaks
+                for (let i = uniqueDates.length - 2; i >= 0; i--) {
+                    const currentDate = new Date(uniqueDates[i+1]);
+                    const previousDate = new Date(uniqueDates[i]);
+                    const diffTime = currentDate - previousDate;
+                    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays === 1) {
+                        if (currentStreak > 0) currentStreak++; // Only increment if part of the current streak
+                        longestStreak = Math.max(longestStreak, currentStreak);
+                    } else {
+                        currentStreak = 0; // Break in streak
+                    }
+                }
+            }
+            return { current: currentStreak, longest: Math.max(longestStreak, currentStreak) };
         }
 
         /**
@@ -377,30 +444,57 @@
 
         // Listener for data updates (called once auth is ready)
         let journalUnsubscribe = null;
+        let appointmentsUnsubscribe = null;
+        let feedbackUnsubscribe = null;
+        let assessmentsUnsubscribe = null;
         function initFirestoreListeners() {
             if (!isOnline() || !userId || !db) return;
 
             // Clean up previous listeners
             if (journalUnsubscribe) journalUnsubscribe();
+            if (appointmentsUnsubscribe) appointmentsUnsubscribe();
+            if (feedbackUnsubscribe) feedbackUnsubscribe();
+            if (assessmentsUnsubscribe) assessmentsUnsubscribe();
 
             try {
                 // Use imported Firestore functions directly (no window prefix needed within module scope)
                 const journalCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/${COLLECTIONS.journal}`);
-                const q = query(journalCollectionRef, orderBy('timestamp', 'desc'), limit(50));
+                const qJournal = query(journalCollectionRef, orderBy('timestamp', 'desc'), limit(50));
 
-                journalUnsubscribe = onSnapshot(q, (snapshot) => {
+                journalUnsubscribe = onSnapshot(qJournal, (snapshot) => {
                     journalLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    // Re-render the active view if it depends on journal logs (Home, Journal)
-                    if (currentView === 'journal') {
-                        renderJournalView(document.getElementById('view-container'));
-                    } else if (currentView === 'home') {
-                        renderHomeView(document.getElementById('view-container'));
-                    }
+                    // If the current view depends on journal logs, refresh it.
+                    if (['home', 'journal'].includes(currentView)) refreshCurrentView();
                 }, (error) => {
                     console.error("Error fetching journal logs:", error);
                     const statusEl = document.getElementById('journal-list-status');
                     if (statusEl) statusEl.textContent = 'Error loading logs. Check connection.';
                 });
+
+                // Appointment Logs
+                const appointmentsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/${COLLECTIONS.appointments}`);
+                const qAppointments = query(appointmentsCollectionRef, orderBy('timestamp', 'desc'), limit(10));
+                appointmentsUnsubscribe = onSnapshot(qAppointments, (snapshot) => {
+                    appointmentLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (currentView === 'forms') renderSubmissionHistory(); // Partial re-render is more efficient here
+                }, (error) => console.error("Error fetching appointment logs:", error));
+
+                // Feedback Logs
+                const feedbackCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/${COLLECTIONS.feedback}`);
+                const qFeedback = query(feedbackCollectionRef, orderBy('timestamp', 'desc'), limit(10));
+                feedbackUnsubscribe = onSnapshot(qFeedback, (snapshot) => {
+                    feedbackLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (currentView === 'forms') renderSubmissionHistory(); // Partial re-render is more efficient here
+                }, (error) => console.error("Error fetching feedback logs:", error));
+
+                // Assessment Logs
+                const assessmentsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/${COLLECTIONS.assessments}`);
+                const qAssessments = query(assessmentsCollectionRef, orderBy('timestamp', 'desc'), limit(10));
+                assessmentsUnsubscribe = onSnapshot(qAssessments, (snapshot) => {
+                    assessmentLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (currentView === 'home') refreshCurrentView(); // Refresh dashboard if new assessment comes in
+                }, (error) => console.error("Error fetching assessment logs:", error));
+
             } catch (error) {
                 console.error("Failed to set up Firestore listeners:", error);
             }
@@ -495,6 +589,7 @@
         function renderHomeView(container) {
             const latestMood = getLatestMoodData();
             const lastCheckIn = latestMood ? `${latestMood.mood} on ${latestMood.date}` : 'No check-in yet.';
+            const latestAssessment = getLatestAssessmentData();
             const lastCheckInEmoji = latestMood ? getMoodEmoji(latestMood.mood) : '✍️';
             const onlineStatus = isOnline();
             
@@ -533,8 +628,8 @@
                             <div class="flex items-center mb-3">
                                 <div class="text-2xl p-3 bg-yellow-200 text-yellow-700 rounded-full mr-4">📝</div>
                                 <div>
-                                    <p class="text-sm font-semibold text-yellow-700 uppercase">Guided Check-ins</p>
-                                    <p class="text-lg font-bold text-gray-800">Ready to Take</p>
+                                    <p class="text-sm font-semibold text-yellow-700 uppercase">Recent Assessment</p>
+                                    <p class="text-lg font-bold text-gray-800">${latestAssessment ? `${latestAssessment.testId.toUpperCase()}: ${latestAssessment.totalScore}` : 'Not Taken Yet'}</p>
                                 </div>
                             </div>
                             <button onclick="window.navigate('assessment')" class="mt-auto text-sm text-yellow-600 hover:text-yellow-800 font-semibold self-start">
@@ -547,7 +642,7 @@
                             <div class="flex items-center mb-3">
                                 <div class="text-2xl p-3 bg-indigo-200 text-indigo-700 rounded-full mr-4">🤖</div>
                                 <div>
-                                    <p class="text-sm font-semibold text-indigo-700 uppercase">Aura AI</p>
+                                    <p class="text-sm font-semibold text-indigo-700 uppercase">Ilona AI</p>
                                     <p class="text-lg font-bold text-gray-800">${onlineStatus ? 'Online & Ready' : 'Offline'}</p>
                                 </div>
                             </div>
@@ -606,12 +701,13 @@
             if (role === 'loading') {
                 const statusDiv = document.createElement('div');
                 statusDiv.className = 'flex items-center mt-2';
+                statusDiv.setAttribute('aria-live', 'polite');
                 const pulse = document.createElement('div');
                 pulse.className = 'ai-pulse mr-2';
                 statusDiv.appendChild(pulse);
                 const statusText = document.createElement('span');
                 statusText.className = 'text-xs text-gray-500';
-                statusText.textContent = 'Aura is typing...';
+                statusText.textContent = 'Ilona is typing...';
                 statusDiv.appendChild(statusText);
                 content.appendChild(statusDiv);
             }
@@ -626,14 +722,17 @@
                 <div class="bg-white rounded-2xl shadow-lg flex flex-col h-[70vh]">
                     <div class="p-4 border-b border-gray-100 flex items-center">
                         <div class="ai-pulse mr-3"></div>
-                        <h2 class="text-2xl font-bold text-indigo-700">Aura AI Support</h2>
+                        <h2 class="text-2xl font-bold text-indigo-700">Ilona AI Support</h2>
                     </div>
 
                     <!-- Chat Window -->
                     <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4">
                         <div class="flex justify-start">
-                            <div class="max-w-xs md:max-w-md p-4 shadow-sm chat-bubble-ai">
-                                <p>Hi there! I'm Aura, your confidential mental wellness companion. I'm here to listen, without judgment, in English or Tagalog. How are you feeling today?</p>
+                            <div class="max-w-md p-4 shadow-sm chat-bubble-ai">
+                                <p class="font-semibold">Hello! I'm Ilona, your confidential wellness companion.</p>
+                                <p class="mt-2">I'm here to listen without judgment and help you explore your thoughts and feelings. Think of me as a first step in understanding what's on your mind. I can communicate in both English and Tagalog.</p>
+                                <p class="mt-2">How are you feeling today?</p>
+                                <p class="text-xs text-gray-500 mt-3">Please remember, I am an AI and not a licensed therapist. For immediate crisis, please use the <strong>Emergency Help</strong> button.</p>
                                 <p class="text-xs text-gray-500 mt-2">Status: <span id="chatbot-status">${onlineStatus ? 'Online' : 'Offline Mode (Chat Unavailable)'}</span></p>
                             </div>
                         </div>
@@ -685,7 +784,26 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
             try {
-                const systemPrompt = "You are 'Aura', a highly empathetic and confidential mental health support chatbot designed for students. Your primary role is to listen, offer compassionate, non-judgemental support, and encourage the user to express themselves comfortably. You must be fluent in both English and Tagalog (Filipino). If the user seems to be speaking Tagalog, respond primarily in Tagalog, and vice versa. Keep responses concise and focused on validation and open-ended questions. CRISIS DETECTION: If you detect any immediate sign of crisis (e.g., talk of self-harm, severe despair, or intent to harm others), you must immediately interrupt with an URGENT ALERT, gently and firmly advise them to use the Emergency Contact button, and provide the school and national hotline numbers prominently. Do NOT give medical advice or clinical diagnoses. Maintain confidentiality.";
+                const systemPrompt = `You are 'Ilona', a highly empathetic and supportive AI companion. Your persona is warm, patient, thoughtful, encouraging, and non-judgmental. Your goal is to make the user feel heard and understood, like they're talking to a caring friend who is also knowledgeable about mental wellness principles. You are fluent in both English and Tagalog.
+
+Your Core Directives:
+1.  **Human-like, Conversational Tone**:
+    *   Use natural language, including contractions (e.g., "it's", "you're", "that's").
+    *   Vary your responses. Instead of always starting with "That sounds difficult," try phrases like, "I'm hearing how much that's weighing on you," "It takes courage to talk about that," or "Thank you for sharing that with me."
+    *   Keep responses concise but warm. Avoid overly long paragraphs.
+
+2.  **Act Like a Counselor (with clear boundaries)**: Your goal is to help users understand their own feelings and develop coping strategies through conversation.
+    *   **Initial Assessment**: Gently ask open-ended questions to understand the user's concerns, how long they've felt this way, and how it's affecting them (e.g., "Can you tell me more about what that feels like?", "How has this been affecting your day-to-day?").
+    *   **Empathetic Listening & Validation**: Always validate the user's feelings. Acknowledge the emotion before anything else.
+    *   **Introduce Simple CBT Concepts**: Help users explore their thought patterns without being clinical. Ask, "What thoughts are going through your mind when you feel this way?" or "I wonder if there's another way to look at this situation?" This is for exploration, not diagnosis.
+    *   **Focus on Coping, Not Curing**: Guide users toward small, actionable steps. Ask, "What's one small thing you could do today just for you?" or "What has helped you get through tough moments in the past?"
+
+2.  **Enforce Strict Safety Boundaries (Crucial)**:
+    *   **CRISIS DETECTION**: If you detect ANY sign of immediate crisis (self-harm, suicide, harm to others), you MUST immediately and firmly interrupt the conversation. Your response must include the phrase "URGENT ALERT" and direct them to use the "Emergency Help" button and provide the national/school hotlines.
+    *   **NO DIAGNOSIS OR MEDICAL ADVICE**: You must NEVER diagnose a condition, suggest medication, or present yourself as a medical professional. If a user asks for a diagnosis, gently refuse and state your limitation, e.g., "I can't provide a diagnosis as I'm an AI and not a doctor, but we can continue to explore these feelings together. For a formal diagnosis, it's best to speak with a professional."
+
+3.  **Language**: Seamlessly switch between English and Tagalog based on the user's language. If they use "Taglish" (a mix), respond in a similar, natural style.
+4.  **Confidentiality**: Reassure users that this is a safe and confidential space for them to share.`;
                 
                 // Format chat history for API call
                 const apiHistory = chatHistory.map(msg => ({
@@ -693,7 +811,7 @@
                     parts: [{ text: msg.text }]
                 }));
 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`;
                 
                 const payload = {
                     contents: apiHistory,
@@ -830,7 +948,14 @@
             container.innerHTML = `
                 <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 min-h-[300px] flex flex-col justify-between transition-opacity duration-300">
                     <div>
-                        <p class="text-sm font-medium text-gray-500 mb-2">${assessmentState.test.toUpperCase()} | Question ${index + 1} of ${total}</p>
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-sm font-medium text-gray-500">${assessmentState.test.toUpperCase()} | Question ${index + 1} of ${total}</p>
+                            <p class="text-sm text-gray-500">Current Score: <strong>${currentScore}</strong></p>
+                        </div>
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-6">
+                            <div class="bg-indigo-600 h-2 rounded-full" style="width: ${((index + 1) / total) * 100}%"></div>
+                        </div>
                         <p class="text-2xl font-bold text-gray-800 mb-6">${question}?</p>
                     </div>
 
@@ -843,10 +968,6 @@
                                 <span class="block text-sm font-light">${score.label}</span>
                             </button>
                         `).join('')}
-                    </div>
-                    
-                    <div class="mt-4 text-center">
-                        <p class="text-sm text-gray-500">Current running score: <strong>${currentScore}</strong></p>
                     </div>
                 </div>
             `;
@@ -870,6 +991,12 @@
                 else if (totalScore <= 14) { interpretation = 'Moderate anxiety. Consider booking an appointment with a counselor.'; colorClass = 'bg-orange-100 text-orange-700'; }
                 else { interpretation = 'Severe anxiety. Seeking professional help is highly recommended. If distress is severe, use the Emergency Contact button.'; colorClass = 'bg-red-100 text-red-700 font-bold'; }
             }
+
+            // Save the result to Firestore
+            saveDataToFirestore('assessments', {
+                testId: testId,
+                totalScore: totalScore
+            });
 
             container.innerHTML = `
                 <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 min-h-[300px] flex flex-col justify-center items-center text-center">
@@ -921,7 +1048,9 @@
             container.innerHTML = `
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg space-y-6">
                     <h2 class="text-3xl font-bold text-gray-800">Guided Wellness Check-in</h2>
-                    <p class="text-gray-600">Answer each question based on how often you have been bothered by the issue over the past **two weeks**.</p>
+                    <p class="text-gray-600">These confidential check-ins use clinically-validated screening tools to help you reflect on your recent feelings. The PHQ-9 assesses symptoms of depression, and the GAD-7 assesses symptoms of anxiety.</p>
+                    <p class="text-gray-600 font-semibold">Please answer each question based on how you have felt over the past <span class="text-indigo-700">two weeks</span>.</p>
+
                     
                     <!-- Test Selector Tabs -->
                     <div class="flex space-x-4 border-b pb-4">
@@ -936,6 +1065,24 @@
                     <!-- Flashcard/Result Container -->
                     <div id="flashcard-container" class="mt-4">
                         <!-- Content injected here by renderCurrentAssessment -->
+                    </div>
+
+                    <!-- References Section -->
+                    <div class="pt-6 border-t mt-6">
+                        <details class="group">
+                            <summary class="text-sm font-medium text-gray-600 hover:text-indigo-700 cursor-pointer list-none group-open:mb-3">
+                                <span class="group-open:hidden">▶ About These Assessments & References</span>
+                                <span class="hidden group-open:inline">▼ About These Assessments & References</span>
+                            </summary>
+                            <div class="text-xs text-gray-500 space-y-3 bg-gray-50 p-4 rounded-lg">
+                                <p>The Patient Health Questionnaire-9 (PHQ-9) and Generalized Anxiety Disorder 7-item (GAD-7) scale are widely approved screening tools used in clinical practice. Their validity is supported by extensive research.</p>
+                                <p class="font-semibold">Key Validation Studies:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>PHQ-9 (Depression):</strong> Kroenke, K., Spitzer, R. L., & Williams, J. B. (2001). The PHQ-9: validity of a brief depression severity measure. <em>Journal of General Internal Medicine, 16</em>(9), 606–613.</li>
+                                    <li><strong>GAD-7 (Anxiety):</strong> Spitzer, R. L., Kroenke, K., Williams, J. B., & Löwe, B. (2006). A brief measure for assessing generalized anxiety disorder: the GAD-7. <em>Archives of Internal Medicine, 166</em>(10), 1092–1097.</li>
+                                </ul>
+                            </div>
+                        </details>
                     </div>
                 </div>
             `;
@@ -995,7 +1142,7 @@
                     color = 'bg-yellow-100 text-yellow-800';
                     break;
                 case 'Anxious':
-                    message = "Anxiety is tough, but you are tougher. Focus on what you can control right now. If you need immediate, non-judgmental support, chat with Aura AI. 💬";
+                    message = "Anxiety is tough, but you are tougher. Focus on what you can control right now. If you need immediate, non-judgmental support, chat with Ilona AI. 💬";
                     color = 'bg-orange-100 text-orange-800';
                     break;
                 case 'Sad':
@@ -1062,81 +1209,152 @@
         function renderJournalView(container) {
             const onlineStatus = isOnline();
             const latestMood = getLatestMoodData();
+            const streaks = calculateStreaks();
             
             container.innerHTML = `
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
                     <h2 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">Mood & Journal Dashboard</h2>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Left Column: Journal Form -->
-                        <div class="p-6 bg-gray-50 rounded-xl">
-                            <h3 class="text-xl font-semibold text-indigo-700 mb-4">Daily Check-In (Requires Internet)</h3>
-                            <form id="journal-form" class="space-y-4">
-                                <div class="space-y-2">
-                                    <label for="mood" class="block font-medium text-gray-700">How would you rate your mood today?</label>
-                                    <select id="mood" name="mood" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                        <option value="" disabled selected>Select an emotion...</option>
-                                        <option value="Great">Great (Feeling motivated and happy)</option>
-                                        <option value="Good">Good (Stable and positive)</option>
-                                        <option value="Neutral">Neutral (Just okay)</option>
-                                        <option value="Stressed">Stressed (Overwhelmed or pressured)</option>
-                                        <option value="Anxious">Anxious (Nervous, worried, or restless)</option>
-                                        <option value="Sad">Sad (Down, blue, or low)</option>
-                                        <option value="Tired">Tired (Low energy, difficulty focusing)</option>
-                                        <option value="Angry">Angry (Frustrated or irritable)</option>
-                                    </select>
-                                </div>
-                                <div class="space-y-2">
-                                    <label for="notes" class="block font-medium text-gray-700">Journal Entry (Optional)</label>
-                                    <textarea id="notes" name="notes" rows="4" maxlength="1000" placeholder="Write down anything you want to reflect on..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                                    <p class="text-sm text-gray-500 float-right" id="notes-char-count">0/1000</p>
-                                </div>
-                                <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400"
-                                    ${!onlineStatus ? 'disabled' : ''}>
-                                    Log Mood & Save Entry
-                                </button>
-                            </form>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Column 1: Journal Form -->
+                        <div class="lg:col-span-1 p-6 bg-gray-50 rounded-xl border">
+                            <h3 class="text-xl font-semibold text-indigo-700 mb-4">Daily Check-In</h3>
+                            <form id="journal-form" class="space-y-4"></form>
                         </div>
 
-                        <!-- Right Column: Widgets -->
-                        <div class="space-y-6">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <!-- Mood Calendar Tracker -->
-                                <div class="p-4 bg-gray-50 rounded-xl">
-                                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Mood Calendar</h3>
-                                    <div id="mood-calendar-container"></div>
-                                </div>
-                                <!-- Anti-Stress Breathing Game -->
-                                <div class="p-4 bg-gray-50 rounded-xl">
-                                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Breathing Guide</h3>
-                                    <div id="breathing-game-container"></div>
-                                </div>
-                            </div>
-
-                            <!-- Mood Trend History -->
-                            <div class="p-4 bg-gray-50 rounded-xl">
+                        <!-- Column 2: Mood Trend History -->
+                        <div class="lg:col-span-1 p-6 bg-gray-50 rounded-xl border">
                                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Mood Trend History</h3>
                                 <div id="motivational-insight" class="my-2 p-3 rounded-lg hidden text-sm"></div>
                                 <div id="mood-chart-container" class="relative h-48">
                                     <!-- Chart will be rendered here -->
                                 </div>
+                        </div>
+
+                        <!-- Column 3: Other Widgets -->
+                        <div class="lg:col-span-1 space-y-6">
+                            <!-- Streaks Widget -->
+                            <div class="p-4 bg-gray-50 rounded-xl border flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-700">Check-in Streak</h3>
+                                    <p class="text-xs text-gray-400">Longest: ${streaks.longest} days</p>
+                                </div>
+                                <div class="text-5xl font-bold text-orange-500 flex items-center">
+                                    <span>${streaks.current}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 ml-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.934l-6.682 9.622a1 1 0 00.193 1.355 1 1 0 001.45-.385c.345-.23.614-.558.822-.934l6.682-9.622a1 1 0 00-.193-1.355z" clip-rule="evenodd" /><path d="M4.885 4.182a1 1 0 00-.385 1.45l6.682 9.622a1 1 0 001.355.193 1 1 0 00.385-1.45L6.24 4.375a1 1 0 00-1.355-.193z" /></svg>
+                                </div>
                             </div>
+                            <!-- Mood Calendar Tracker -->
+                            <div class="p-4 bg-gray-50 rounded-xl border">
+                                <h3 class="text-lg font-semibold text-gray-700 mb-2">Mood Calendar</h3>
+                                <div id="mood-calendar-container"></div>
+                            </div>
+                            <!-- Anti-Stress Breathing Game -->
+                            <div class="p-4 bg-gray-50 rounded-xl border">
+                                <h3 class="text-lg font-semibold text-gray-700 mb-2">Breathing Guide</h3>
+                                <div id="breathing-game-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Journal Entries Section -->
+                    <div class="mt-8 border-t pt-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Past Journal Entries</h3>
+                        <div class="flex flex-col sm:flex-row gap-4 mb-4 p-4 bg-gray-50 rounded-xl border">
+                            <input type="text" id="journal-search" placeholder="Search entries by keyword..." class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <select id="journal-mood-filter" class="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="all">Filter by Mood (All)</option>
+                                <option value="Great">Great</option>
+                                <option value="Good">Good</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Stressed">Stressed</option>
+                                <option value="Anxious">Anxious</option>
+                                <option value="Sad">Sad</option>
+                                <option value="Tired">Tired</option>
+                                <option value="Angry">Angry</option>
+                            </select>
+                        </div>
+                        <div id="journal-logs-container" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                            <!-- Filtered logs will be rendered here by renderJournalLogs() -->
                         </div>
                     </div>
                 </div>
             `;
             
+            // Inject form content separately to keep main structure clean
+            document.getElementById('journal-form').innerHTML = `
+                <div class="space-y-2">
+                    <label for="mood" class="block font-medium text-gray-700">How would you rate your mood today?</label>
+                    <select id="mood" name="mood" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="" disabled selected>Select an emotion...</option>
+                        <option value="Great">Great (Feeling motivated and happy)</option>
+                        <option value="Good">Good (Stable and positive)</option>
+                        <option value="Neutral">Neutral (Just okay)</option>
+                        <option value="Stressed">Stressed (Overwhelmed or pressured)</option>
+                        <option value="Anxious">Anxious (Nervous, worried, or restless)</option>
+                        <option value="Sad">Sad (Down, blue, or low)</option>
+                        <option value="Tired">Tired (Low energy, difficulty focusing)</option>
+                        <option value="Angry">Angry (Frustrated or irritable)</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label for="notes" class="block font-medium text-gray-700">Journal Entry (Optional)</label>
+                    <textarea id="notes" name="notes" rows="4" maxlength="1000" placeholder="Write down anything you want to reflect on..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    <p class="text-sm text-gray-500 float-right" id="notes-char-count">0/1000</p>
+                </div>
+                <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400" ${!onlineStatus ? 'disabled' : ''}>Log Mood & Save Entry</button>
+            `;
+
             document.getElementById('notes').addEventListener('input', (e) => {
                 document.getElementById('notes-char-count').textContent = `${e.target.value.length}/1000`;
             });
 
             document.getElementById('journal-form').addEventListener('submit', handleJournalSubmit);
+            document.getElementById('journal-search').addEventListener('input', renderJournalLogs);
+            document.getElementById('journal-mood-filter').addEventListener('change', renderJournalLogs);
             
             // Render data and insights after setting up the DOM elements
             renderMoodChart();
             renderMotivationalInsight(latestMood);
             renderMoodCalendar();
             renderBreathingGame(); 
+            renderJournalLogs(); // Initial render of all logs
+        }
+
+        function renderJournalLogs() {
+            const container = document.getElementById('journal-logs-container');
+            if (!container) return;
+
+            const searchTerm = document.getElementById('journal-search')?.value.toLowerCase() || '';
+            const moodFilter = document.getElementById('journal-mood-filter')?.value || 'all';
+
+            const filteredLogs = journalLogs.filter(log => {
+                const matchesMood = (moodFilter === 'all' || log.mood === moodFilter);
+                const matchesSearch = (
+                    !searchTerm || 
+                    log.notes?.toLowerCase().includes(searchTerm) ||
+                    log.mood?.toLowerCase().includes(searchTerm)
+                );
+                return matchesMood && matchesSearch;
+            });
+
+            if (filteredLogs.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 p-6 bg-gray-50 rounded-lg">No entries match your search. Try broadening your criteria or logging a new entry!</p>`;
+                return;
+            }
+
+            container.innerHTML = filteredLogs.map(log => {
+                const logDate = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available';
+                return `
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="font-bold text-gray-700">${getMoodEmoji(log.mood)} ${log.mood}</p>
+                            <p class="text-sm text-gray-500">${logDate}</p>
+                        </div>
+                        <p class="text-gray-600 text-sm">${log.notes ? log.notes.replace(/\n/g, '<br>') : '<em>No notes for this entry.</em>'}</p>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderMoodCalendar() {
@@ -1446,6 +1664,56 @@
             }
         }
 
+        function renderSubmissionHistory() {
+            const container = document.getElementById('submission-history-container');
+            if (!container) return;
+
+            const allSubmissions = [
+                ...appointmentLogs.map(log => ({ ...log, type: 'Appointment' })),
+                ...feedbackLogs.map(log => ({ ...log, type: 'Feedback' }))
+            ].sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+            if (allSubmissions.length === 0) {
+                container.innerHTML = `<p class="text-sm text-gray-500 text-center py-4">Your submitted requests and feedback will appear here once you send them.</p>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="space-y-3 max-h-64 overflow-y-auto pr-2">
+                    ${allSubmissions.map(log => {
+                        const logDate = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Pending...';
+                        let title = '';
+                        let details = '';
+                        let statusColor = 'bg-yellow-200 text-yellow-800'; // Default: Pending
+
+                        if (log.type === 'Appointment') {
+                            title = `Booking Request`;
+                            details = `For: ${log.counselor} on ${new Date(log.date_pref).toLocaleDateString()}`;
+                            if (log.status === 'Confirmed') statusColor = 'bg-green-200 text-green-800';
+                            if (log.status === 'Cancelled') statusColor = 'bg-red-200 text-red-800';
+                        } else { // Feedback
+                            title = `Feedback: ${log.type}`;
+                            details = `"${log.message.substring(0, 40)}..."`;
+                            if (log.status === 'Reviewed') statusColor = 'bg-blue-200 text-blue-800';
+                        }
+
+                        return `
+                            <div class="p-3 bg-white rounded-lg border border-gray-200 text-sm">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-bold text-gray-700">${title}</p>
+                                        <p class="text-xs text-gray-500">${details}</p>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColor}">${log.status || 'Pending'}</span>
+                                </div>
+                                <p class="text-right text-xs text-gray-400 mt-1">${logDate}</p>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
         function renderFormsView(container) {
             const onlineStatus = isOnline();
             container.innerHTML = `
@@ -1534,13 +1802,16 @@
                                 </ul>
                             </div>
                             <div class="p-4 bg-gray-100 rounded-lg">
-                                <h4 class="font-semibold text-gray-700 mb-2">Your Recent Submissions:</h4>
-                                <p class="text-sm text-gray-500 text-center py-4">Your submitted requests and feedback will appear here. (Feature coming soon)</p>
+                                <h4 class="font-semibold text-gray-700 mb-3">Your Recent Submissions:</h4>
+                                <div id="submission-history-container">
+                                    <!-- History will be rendered here -->
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+            renderSubmissionHistory(); // Initial render
             document.getElementById('appointment-form').addEventListener('submit', handleAppointmentSubmit);
             document.getElementById('feedback-form').addEventListener('submit', handleFeedbackSubmit);
         }
